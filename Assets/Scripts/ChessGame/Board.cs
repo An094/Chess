@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+[RequireComponent(typeof(SquareSelectorCreator))]
 public class Board : MonoBehaviour
 {
     [SerializeField] private Transform bottomLeftSquareTransform;
@@ -11,6 +12,7 @@ public class Board : MonoBehaviour
     private Piece[,] grid;
     private Piece selectedPiece;
     private ChessGameController chessController;
+    private SquareSelectorCreator squareSelector;
 
     public const int BOARD_SIZE = 8;
 
@@ -21,6 +23,7 @@ public class Board : MonoBehaviour
 
     public void SetDependencies(ChessGameController chessController)
     {
+        squareSelector = GetComponent<SquareSelectorCreator>();
         this.chessController = chessController;
     }
 
@@ -91,11 +94,26 @@ public class Board : MonoBehaviour
     private void SelectPiece(Piece piece)
     {
         selectedPiece = piece;
+        List<Vector2Int> selection = selectedPiece.availableMoves;
+        ShowSelectionSquares(selection);
+    }
+
+    private void ShowSelectionSquares(List<Vector2Int> selection)
+    {
+        Dictionary<Vector3, bool> squaresData = new Dictionary<Vector3, bool>();
+        for( int i = 0; i < selection.Count; i++ )
+        {
+            Vector3 position = CalculatePositionFromCoords(selection[i]);
+            bool isSquareFree = GetPieceOnSquare(selection[i]) == null;
+            squaresData.Add(position, isSquareFree);
+        }
+        squareSelector.ShowSelection(squaresData);
     }
 
     private void DeselectPiece()
     {
         selectedPiece = null;
+        squareSelector.ClearSelection();
     }
 
     public Piece GetPieceOnSquare(Vector2Int coords)
