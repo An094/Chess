@@ -11,9 +11,9 @@ GameObject:
   - component: {fileID: 422114}
   - component: {fileID: 3379130}
   - component: {fileID: 2300604}
-  - component: {fileID: 2752817802440847842}
   - component: {fileID: 1036704131395567028}
   - component: {fileID: 594643348577615026}
+  - component: {fileID: 8474711171538989140}
   m_Layer: 0
   m_Name: King
   m_TagString: Untagged
@@ -86,18 +86,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!114 &2752817802440847842
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 119820}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 58e927e86958627419bb3fe474d0d134, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &1036704131395567028
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -123,3 +111,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   availableMoves: []
+--- !u!114 &8474711171538989140
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 119820}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4ae8602ee675c674bbb8f347eb10f619, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

@@ -10,7 +10,7 @@ public abstract class Piece : MonoBehaviour
     private MaterialSetter materialSetter;
 
     public Board board { protected get; set; }
-    public Vector2Int occupieedSquare { get; set; }
+    public Vector2Int occupiedSquare { get; set; }
     public TeamColor team { get; set; }
     public bool hasMoved { get; private set; }
     public List<Vector2Int> availableMoves;
@@ -45,7 +45,10 @@ public abstract class Piece : MonoBehaviour
 
     public virtual void MovePiece(Vector2Int coords)
     {
-
+        Vector3 targetPosition = board.CalculatePositionFromCoords(coords);
+        occupiedSquare = coords;
+        hasMoved = true;
+        tweener.MoveTo(transform, targetPosition);
     }
 
     protected void TryToAddMove(Vector2Int coords)
@@ -55,7 +58,7 @@ public abstract class Piece : MonoBehaviour
     public void SetData(Vector2Int squareCoords, TeamColor team, Board board)
     {
         this.team = team;
-        occupieedSquare = squareCoords;
+        occupiedSquare = squareCoords;
         this.board = board;
         transform.position = board.CalculatePositionFromCoords(squareCoords);
     }
