@@ -13,8 +13,7 @@ public class ChessGameController : MonoBehaviour
     private ChessPlayer whitePlayer;
     private ChessPlayer blackPlayer;
     private ChessPlayer activePlayer;
-    int i;
-
+    
     private void Awake()
     {
         SetDependencies();
@@ -37,17 +36,11 @@ public class ChessGameController : MonoBehaviour
         StartNewGame();
     }
 
-    private void Update()
-    {
-        Debug.Log("ActivePlayer = "+ i);
-    }
-
     private void StartNewGame()
     {
         board.SetDependencies(this);
         CreatePiecesFromLayout(startingBoardLayout);
         activePlayer = whitePlayer;
-        i = 0;
         GenerateAllPossiblePlayerMoves(activePlayer);
     }
 
@@ -97,8 +90,18 @@ public class ChessGameController : MonoBehaviour
 
     private void ChangeActiveTeam()
     {
-        i = 1 - i;
-        activePlayer = activePlayer == whitePlayer ? blackPlayer : whitePlayer;
+        bool cond = activePlayer == whitePlayer;
+        if(cond)
+        {
+            activePlayer = blackPlayer;
+            Debug.Log("Change Active Player to black");
+        }
+        else
+        {
+            activePlayer = whitePlayer;
+            Debug.Log("Change Active Player to white");
+        }
+        //activePlayer = activePlayer == whitePlayer ? blackPlayer : whitePlayer;
     }
 
     private ChessPlayer GetOpponentToPlayer(ChessPlayer player)
