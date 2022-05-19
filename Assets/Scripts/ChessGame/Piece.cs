@@ -38,6 +38,18 @@ public abstract class Piece : MonoBehaviour
         return team == piece.team;
     }
 
+    public bool IsAttackingPieceOfType<T>() where T : Piece
+    {
+        foreach(var square in availableMoves)
+        {
+            if(board.GetPieceOnSquare(square) is T)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public bool CanMoveTo(Vector2Int coords)
     {
         return availableMoves.Contains(coords);

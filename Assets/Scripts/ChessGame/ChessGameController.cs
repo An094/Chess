@@ -1,11 +1,13 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 [RequireComponent(typeof(PieceCreator))]
 public class ChessGameController : MonoBehaviour
 {
+    private enum GameState { Init, Play, Finished}
     [SerializeField] private BoardLayout startingBoardLayout;
     [SerializeField] private Board board;
 
@@ -13,6 +15,7 @@ public class ChessGameController : MonoBehaviour
     private ChessPlayer whitePlayer;
     private ChessPlayer blackPlayer;
     private ChessPlayer activePlayer;
+    private GameState state;
     
     private void Awake()
     {
@@ -38,10 +41,22 @@ public class ChessGameController : MonoBehaviour
 
     private void StartNewGame()
     {
+        SetGameState(GameState.Init);
         board.SetDependencies(this);
         CreatePiecesFromLayout(startingBoardLayout);
         activePlayer = whitePlayer;
         GenerateAllPossiblePlayerMoves(activePlayer);
+        SetGameState(GameState.Play);
+    }
+
+    private void SetGameState(GameState state)
+    {
+        this.state = state;
+    }
+
+    public bool IsGameInProgress()
+    {
+        return state == GameState.Play; 
     }
 
     private void GenerateAllPossiblePlayerMoves(ChessPlayer player)
@@ -85,23 +100,56 @@ public class ChessGameController : MonoBehaviour
     {
         GenerateAllPossiblePlayerMoves(activePlayer);
         GenerateAllPossiblePlayerMoves(GetOpponentToPlayer(activePlayer));
-        ChangeActiveTeam();
+        if(CheckIfGameIsFinished())
+        {
+            EndGame();
+        }
+        else
+        {
+            ChangeActiveTeam();
+        }
+    }
+
+    private bool CheckIfGameIsFinished()
+    {
+        Piece[] kingAttackingPieces = activePlayer.GetPiecesAttackingOppositePieceOfType<King>();
+        if(kingAttackingPieces.Length > 0)
+        {
+            ChessPlayer oppositePlayer = GetOpponentToPlayer(activePlayer);
+            Piece attackedKing = oppositePlayer.GetPiecesOfType<King>().FirstOrDefault();
+            oppositePlayer.RemoveMovesEnablingAttackOnPiece<King>(activePlayer, attackedKing);
+
+            int availableMoves = attackedKing.availableMoves.Count;
+            if(availableMoves == 0)
+            {
+                bool canCoverKing = oppositePlayer.CanHidePieceFromAttack<King>(activePlayer);
+                if (!canCoverKing)
+                    return true;
+            }
+        }
+        return false;
+    }
+
+    private void EndGame()
+    {
+        Debug.Log("EndGame");
+        SetGameState(GameState.Finished);
     }
 
     private void ChangeActiveTeam()
     {
-        bool cond = activePlayer == whitePlayer;
-        if(cond)
-        {
-            activePlayer = blackPlayer;
-            Debug.Log("Change Active Player to black");
-        }
-        else
-        {
-            activePlayer = whitePlayer;
-            Debug.Log("Change Active Player to white");
-        }
-        //activePlayer = activePlayer == whitePlayer ? blackPlayer : whitePlayer;
+        //bool cond = activePlayer == whitePlayer;
+        //if(cond)
+        //{
+        //    activePlayer = blackPlayer;
+        //    Debug.Log("Change Active Player to black");
+        //}
+        //else
+        //{
+        //    activePlayer = whitePlayer;
+        //    Debug.Log("Change Active Player to white");
+        //}
+        activePlayer = activePlayer == whitePlayer ? blackPlayer : whitePlayer;
     }
 
     private ChessPlayer GetOpponentToPlayer(ChessPlayer player)
