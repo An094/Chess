@@ -34,7 +34,7 @@ public class Pawn : Piece
             Piece piece = board.GetPieceOnSquare(nextCoords);
             if(!board.CheckIfCoordinatedAreOnBoard(nextCoords))
             {
-                break;
+                continue;
             }
             if(piece != null && !piece.IsFromSameTeam(this))
             {

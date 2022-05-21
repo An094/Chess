@@ -98,6 +98,7 @@ public class ChessPlayer
             foreach(var coords in piece.availableMoves)
             {
                 Piece pieceOnCoords = board.GetPieceOnSquare(coords);
+                board.UpdateBoardOnPieceMove(coords, piece.occupiedSquare, piece, null);
                 opponent.GenerateAllPossibleMoves();
                 if(!opponent.CheckIfIsAttackingPiece<T>())
                 {
