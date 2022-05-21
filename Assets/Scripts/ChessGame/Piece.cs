@@ -57,6 +57,7 @@ public abstract class Piece : MonoBehaviour
 
     public virtual void MovePiece(Vector2Int coords)
     {
+        board.lastMovedPiece = this;
         Vector3 targetPosition = board.CalculatePositionFromCoords(coords);
         occupiedSquare = coords;
         hasMoved = true;

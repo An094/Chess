@@ -11,6 +11,7 @@ public class Board : MonoBehaviour
 
     private Piece[,] grid;
     private Piece selectedPiece;
+    public Piece lastMovedPiece;
     private ChessGameController chessController;
     private SquareSelectorCreator squareSelector;
 
@@ -113,6 +114,11 @@ public class Board : MonoBehaviour
             grid[piece.occupiedSquare.x, piece.occupiedSquare.y] = null;
             chessController.OnPieceRemoved(piece);
         }
+    }
+
+    public void EnPassant(Pawn pawn, Piece enPassantPiece)
+    {
+        TakePiece(enPassantPiece);
     }
 
     private void EndTurn()
