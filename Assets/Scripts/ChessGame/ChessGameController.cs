@@ -10,6 +10,7 @@ public class ChessGameController : MonoBehaviour
     private enum GameState { Init, Play, Finished}
     [SerializeField] private BoardLayout startingBoardLayout;
     [SerializeField] private Board board;
+    [SerializeField] private ChessUIManager uiManager;
 
     private PieceCreator pieceCreator;
     private ChessPlayer whitePlayer;
@@ -41,12 +42,28 @@ public class ChessGameController : MonoBehaviour
 
     private void StartNewGame()
     {
+        uiManager.HideUI();
         SetGameState(GameState.Init);
         board.SetDependencies(this);
         CreatePiecesFromLayout(startingBoardLayout);
         activePlayer = whitePlayer;
         GenerateAllPossiblePlayerMoves(activePlayer);
         SetGameState(GameState.Play);
+    }
+
+    public void RestartGame()
+    {
+        DestroyPieces();
+        board.OnGameRestarted();
+        whitePlayer.OnGameRestarted();
+        blackPlayer.OnGameRestarted();
+        StartNewGame();
+    }
+
+    private void DestroyPieces()
+    {
+        whitePlayer.activePieces.ForEach(p => Destroy(p.gameObject));
+        blackPlayer.activePieces.ForEach(p => Destroy(p.gameObject));
     }
 
     private void SetGameState(GameState state)
@@ -82,7 +99,7 @@ public class ChessGameController : MonoBehaviour
         return activePlayer.team == team;
     }
 
-    private void CreatePieceAndInitialize(Vector2Int squareCoords, TeamColor team, Type type)
+    public void CreatePieceAndInitialize(Vector2Int squareCoords, TeamColor team, Type type)
     {
         Piece newPiece = pieceCreator.CreatePiece(type).GetComponent<Piece>();
         newPiece.SetData(squareCoords, team, board);
@@ -110,6 +127,13 @@ public class ChessGameController : MonoBehaviour
         }
     }
 
+    public void OnPieceRemoved(Piece piece)
+    {
+        ChessPlayer pieceOwner = (piece.team == TeamColor.White) ? whitePlayer : blackPlayer;
+        pieceOwner.RemovePiece(piece);
+        Destroy(piece.gameObject);
+    }
+
     private bool CheckIfGameIsFinished()
     {
         Piece[] kingAttackingPieces = activePlayer.GetPiecesAttackingOppositePieceOfType<King>();
@@ -133,6 +157,7 @@ public class ChessGameController : MonoBehaviour
     private void EndGame()
     {
         Debug.Log("EndGame");
+        uiManager.OnGameFinised(activePlayer.team.ToString());
         SetGameState(GameState.Finished);
     }
 
@@ -155,5 +180,10 @@ public class ChessGameController : MonoBehaviour
     private ChessPlayer GetOpponentToPlayer(ChessPlayer player)
     {
         return player == whitePlayer ? blackPlayer : whitePlayer;
+    }
+
+    public void RemoveMovesEnablingAttackOnPiecOfType<T>(Piece piece) where T : Piece
+    {
+        activePlayer.RemoveMovesEnablingAttackOnPiece<T>(GetOpponentToPlayer(activePlayer), piece);    
     }
 }
