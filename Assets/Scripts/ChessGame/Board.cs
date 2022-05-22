@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(SquareSelectorCreator))]
-public class Board : MonoBehaviour
+public abstract class Board : MonoBehaviour
 {
     [SerializeField] private Transform bottomLeftSquareTransform;
     [SerializeField] private float squareSize;
@@ -17,14 +17,18 @@ public class Board : MonoBehaviour
 
     public const int BOARD_SIZE = 8;
 
-    private void Awake()
+    public abstract void SelectPieceMoved(Vector2 coords);   
+    public abstract void SetSelectedPiece(Vector2 coords);   
+
+    protected virtual void Awake()
     {
+        squareSelector = GetComponent<SquareSelectorCreator>();
         CreateGrid();
     }
 
     public void SetDependencies(ChessGameController chessController)
     {
-        squareSelector = GetComponent<SquareSelectorCreator>();
+        //squareSelector = GetComponent<SquareSelectorCreator>();
         this.chessController = chessController;
     }
 
@@ -53,7 +57,7 @@ public class Board : MonoBehaviour
 
     public void OnSquareSelected(Vector3 inputPosition)
     {
-        if(!chessController.IsGameInProgress())
+        if(!chessController || !chessController.CanPerformMove())
         {
             return;
         }
@@ -67,18 +71,18 @@ public class Board : MonoBehaviour
             }
             else if(piece != null && selectedPiece != piece && chessController.IsTeamTurnActive(piece.team))
             {
-                SelectPiece(piece);
+                SelectPiece(coords);
             }
             else if(selectedPiece.CanMoveTo(coords))
             {
-                OnSelectedPieceMoved(coords, selectedPiece);
+                SelectPieceMoved(coords);
             }
         }
         else
         {
             if(piece != null && chessController.IsTeamTurnActive(piece.team))
             {
-                SelectPiece(piece);
+                SelectPiece(coords);
             }
         }
     }
@@ -89,13 +93,18 @@ public class Board : MonoBehaviour
         chessController.CreatePieceAndInitialize(piece.occupiedSquare, piece.team, typeof(Queen));
     }
 
-    private void OnSelectedPieceMoved(Vector2Int coords, Piece piece)
+    public void OnSelectedPieceMoved(Vector2Int coords)
     {
         TryToTakeOppositePiece(coords);
-        UpdateBoardOnPieceMove(coords, piece.occupiedSquare, piece, null);
+        UpdateBoardOnPieceMove(coords, selectedPiece.occupiedSquare, selectedPiece, null);
         selectedPiece.MovePiece(coords);
         DeselectPiece();
         EndTurn();
+    }
+    public void OnSetSelectedPiece(Vector2Int coords)
+    {
+        Piece piece = GetPieceOnSquare(coords);
+        selectedPiece = piece;
     }
 
     private void TryToTakeOppositePiece(Vector2Int coords)
@@ -132,10 +141,11 @@ public class Board : MonoBehaviour
         grid[newCoords.x, newCoords.y] = newPiece;
     }
 
-    private void SelectPiece(Piece piece)
+    private void SelectPiece(Vector2Int coords)
     {
+        Piece piece = GetPieceOnSquare(coords);
         chessController.RemoveMovesEnablingAttackOnPiecOfType<King>(piece);
-        selectedPiece = piece;
+        SetSelectedPiece(coords);
         List<Vector2Int> selection = selectedPiece.availableMoves;
         ShowSelectionSquares(selection);
     }
