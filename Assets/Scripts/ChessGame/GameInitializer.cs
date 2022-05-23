@@ -19,7 +19,7 @@ public class GameInitializer : MonoBehaviour
 
     public void CreateMultiplayerBoard()
     {
-        if(networkManager.IsRoomFull())
+        //if(networkManager.IsRoomFull())
         {
             PhotonNetwork.Instantiate(multiplayerBoardPrefab.name, boardAnchor.position, boardAnchor.rotation);
 
