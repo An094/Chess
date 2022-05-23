@@ -52,7 +52,7 @@ public class ChessUIManager : MonoBehaviour
         connectionStatusText.gameObject.SetActive(false);
     }
 
-    private void OnGameLaunched()
+    public void OnGameLaunched()
     {
         DisableAllScreens();
         gameModeSelectionScreen.SetActive(true);
